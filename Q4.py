@@ -82,17 +82,24 @@ def main(unused_argv):
     global last_loss
     global before_last_loss
 
-
     x_train = mnist.train.images  # Returns np.array
     y_train = np.asarray(mnist.train.labels, dtype=np.int32)
 
-    validation_idx = np.random.randint(x_train.shape[0], size=int(x_train.shape[0] * 0.2))
+    validation_size = int(x_train.shape[0] * 0.2)
+    validation_idx = []
+    while len(validation_idx) != validation_size:
+        idx = np.random.randint(0, x_train.shape[0])
+        if idx not in validation_idx:
+            validation_idx.append(idx)
+
     x_validation = x_train[validation_idx, :]
     y_validation = y_train[validation_idx, ]
 
+    x_train = x_train[[x for x in range(x_train.shape[0]) if x not in validation_idx]]
+    y_train = y_train[[y for y in range(y_train.shape[0]) if y not in validation_idx]]
+
     x_test = mnist.test.images  # Returns np.array
     y_test = np.asarray(mnist.test.labels, dtype=np.int32)
-
 
     classifier = tf.estimator.Estimator(model_fn=create_training_net,)
                                       # config=tf.contrib.learn.RunConfig(save_checkpoints_steps=10))
@@ -106,8 +113,8 @@ def main(unused_argv):
                                                  shuffle=True)
 
 
-    for i in range(50):
-        classifier.train(input_fn=train_net, steps=100)
+    for i in range(5000):
+        classifier.train(input_fn=train_net, steps=1)
         validation_net = tf.estimator.inputs.numpy_input_fn(x=x_validation,
                                                 y=y_validation,
                                                 num_epochs=1,
