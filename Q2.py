@@ -9,7 +9,8 @@ POST_CONV_SIZE = [-1, 7 * 7 * 64]
 
 def create_conv_layer(x, row, col, filters):
     conv = tf.layers.conv2d(inputs=x, filters=filters, kernel_size=[row, col],
-                            padding="same", activation=tf.nn.relu)
+                            padding="same", activation=tf.nn.relu,
+                            kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     pool = tf.layers.max_pooling2d(inputs=conv, pool_size=[2, 2], strides=2)
 
@@ -17,7 +18,8 @@ def create_conv_layer(x, row, col, filters):
 
 
 def create_dense_layer(x, size):
-    dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu)
+    dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
+                            kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     return dense
 
@@ -27,9 +29,10 @@ def create_cnn_net(input_layer):
     conv2 = create_conv_layer(conv1, 5, 5, 64)
     flattened = tf.reshape(conv2, POST_CONV_SIZE)
     dense1 = create_dense_layer(flattened, 1024)
-    dense2 = create_dense_layer(dense1, 10)
+    dense2 = create_dense_layer(dense1, 1024)
+    dense3 = create_dense_layer(dense2, 10)
 
-    return dense2
+    return dense3
 
 
 def create_training_net(features, labels, mode):
