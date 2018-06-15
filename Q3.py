@@ -9,11 +9,13 @@ POST_CONV_SIZE = [-1, 7 * 7 * 64]
 
 def create_conv_layer(x, row, col, filters, mode):
     conv = tf.layers.conv2d(inputs=x, filters=filters, kernel_size=[row, col],
-                            padding="same", activation=tf.nn.relu,
+                            padding="same",
                             kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     norm = tf.layers.batch_normalization(conv,
                                          training=mode == tf.estimator.ModeKeys.TRAIN)
+
+    norm = tf.nn.relu(norm)
 
     pool = tf.layers.max_pooling2d(inputs=norm, pool_size=[2, 2], strides=2)
 
