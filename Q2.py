@@ -17,9 +17,14 @@ def create_conv_layer(x, row, col, filters):
     return pool
 
 
-def create_dense_layer(x, size):
-    dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
-                            kernel_initializer=tf.contrib.layers.xavier_initializer())
+def create_dense_layer(x, size, output=False):
+    if output:
+        dense = tf.layers.dense(inputs=x, units=size,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
+
+    else:
+        dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     return dense
 
@@ -30,9 +35,9 @@ def create_cnn_net(input_layer):
     flattened = tf.reshape(conv2, POST_CONV_SIZE)
     dense1 = create_dense_layer(flattened, 1024)
     dense2 = create_dense_layer(dense1, 1024)
-    dense3 = create_dense_layer(dense2, 10)
+    out = create_dense_layer(dense2, 10, output=True)
 
-    return dense3
+    return out
 
 
 def create_training_net(features, labels, mode):

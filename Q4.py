@@ -22,8 +22,14 @@ def create_conv_layer(x, row, col, filters):
     return pool
 
 
-def create_dense_layer(x, size):
-    dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu)
+def create_dense_layer(x, size, output=False):
+    if output:
+        dense = tf.layers.dense(inputs=x, units=size,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
+
+    else:
+        dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     return dense
 
@@ -33,14 +39,15 @@ def create_cnn_net(input_layer):
     conv2 = create_conv_layer(conv1, 5, 5, 64)
     flattened = tf.reshape(conv2, POST_CONV_SIZE)
     dense1 = create_dense_layer(flattened, 1024)
-    dense2 = create_dense_layer(dense1, 10)
+    dense2 = create_dense_layer(dense1, 1024)
+    out = create_dense_layer(dense2, 10, output=True)
 
-    return dense2
+    return out
 
 
 def create_training_net(features, labels, mode):
 
-    print('entered create_training_net !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    # print('entered create_training_net !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
     input_layer = tf.reshape(features, IMAGE_SHAPE)
     cnn_net = create_cnn_net(input_layer)
@@ -120,7 +127,7 @@ def main(unused_argv):
                                                 num_epochs=1,
                                                 shuffle=False)
         validation_res = classifier.evaluate(input_fn=validation_net)
-        print('int iteration ', i, ' loss is = ', validation_res['loss'])
+        # print('int iteration ', i, ' loss is = ', validation_res['loss'])
         if before_last_loss == last_loss == validation_res['loss']:
             print('no improvement for 3 batches in a row')
             print('stopping training')

@@ -12,20 +12,22 @@ def create_conv_layer(x, row, col, filters, mode):
                             padding="same", activation=tf.nn.relu,
                             kernel_initializer=tf.contrib.layers.xavier_initializer())
 
-    if mode == tf.estimator.ModeKeys.TRAIN:
-        norm = tf.contrib.layers.batch_norm(conv, is_training=True)
-
-    else:
-        norm = tf.contrib.layers.batch_norm(conv, is_training=False)
+    norm = tf.layers.batch_normalization(conv,
+                                         training=mode == tf.estimator.ModeKeys.TRAIN)
 
     pool = tf.layers.max_pooling2d(inputs=norm, pool_size=[2, 2], strides=2)
 
     return pool
 
 
-def create_dense_layer(x, size):
-    dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
-                            kernel_initializer=tf.contrib.layers.xavier_initializer())
+def create_dense_layer(x, size, output=False):
+    if output:
+        dense = tf.layers.dense(inputs=x, units=size,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
+
+    else:
+        dense = tf.layers.dense(inputs=x, units=size, activation=tf.nn.relu,
+                                kernel_initializer=tf.contrib.layers.xavier_initializer())
 
     return dense
 
@@ -38,9 +40,9 @@ def create_cnn_net(input_layer, mode):
     dropout = tf.layers.dropout(inputs=dense1, rate=0.4,
                                 training=mode == tf.estimator.ModeKeys.TRAIN)
     dense2 = create_dense_layer(dropout, 1024)
-    dense3 = create_dense_layer(dense2, 10)
+    out = create_dense_layer(dense2, 10, output=True)
 
-    return dense3
+    return out
 
 
 def create_training_net(features, labels, mode):
