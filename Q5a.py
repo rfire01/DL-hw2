@@ -64,7 +64,12 @@ def create_training_net(features, labels, mode):
                                              every_n_iter=250)
 
     if mode ==tf.estimator.ModeKeys.TRAIN:
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+        lr = tf.train.get_global_step()
+        lr = tf.floordiv(lr, 400)
+        lr = tf.cast(lr, dtype=tf.float32)
+        lr = tf.pow(0.5, lr)
+        lr = tf.multiply(0.001, lr)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=lr)
         optimize = optimizer.minimize(loss=loss,
                                       global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss,

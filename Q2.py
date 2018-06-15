@@ -52,9 +52,7 @@ def create_training_net(features, labels, mode):
     loss = tf.losses.sparse_softmax_cross_entropy(labels=labels,
                                                   logits=cnn_net)
 
-    cost = tf.nn.l2_loss(cnn_net - tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10) )
-    cost_logging =tf.train.LoggingTensorHook({"cost": loss,
-                                              "cost2": cost},
+    cost_logging =tf.train.LoggingTensorHook({"cost": loss},
                                              every_n_iter=250)
 
     if mode ==tf.estimator.ModeKeys.TRAIN:
