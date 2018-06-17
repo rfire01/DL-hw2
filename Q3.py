@@ -91,7 +91,6 @@ def main(unused_argv):
                                                  num_epochs=None,
                                                  shuffle=True)
   classifier.train(input_fn=train_net, steps=5000)
-  tf.estimator.train_and_evaluate
 
   test_net = tf.estimator.inputs.numpy_input_fn(x=x_test,
                                                 y=y_test,

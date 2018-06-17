@@ -62,6 +62,10 @@ def create_training_net(features, labels, mode):
     cost_logging =tf.train.LoggingTensorHook({"cost": loss},
                                              every_n_iter=250)
 
+    correct_prediction = tf.equal(predictions, tf.cast(labels, tf.int64))
+    accuracy_tb = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.summary.scalar("accuracy_tb", accuracy_tb)
+
     if mode ==tf.estimator.ModeKeys.TRAIN:
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
         optimize = optimizer.minimize(loss=loss,
@@ -91,7 +95,6 @@ def main(unused_argv):
                                                  num_epochs=None,
                                                  shuffle=True)
   classifier.train(input_fn=train_net, steps=5000)
-  tf.estimator.train_and_evaluate
 
   test_net = tf.estimator.inputs.numpy_input_fn(x=x_test,
                                                 y=y_test,
