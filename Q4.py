@@ -118,11 +118,16 @@ def main(unused_argv):
         before_last_loss = last_loss
         last_loss = validation_res['loss']
 
+    validation_res = classifier.evaluate(input_fn=validation_net)
+    print("validation results:")
+    print(validation_res)
+
     test_net = tf.estimator.inputs.numpy_input_fn(x=x_test,
                                                 y=y_test,
                                                 num_epochs=1,
                                                 shuffle=False)
     results = classifier.evaluate(input_fn=test_net)
+    print("test results:")
     print(results)
 
 
